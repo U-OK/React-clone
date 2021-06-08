@@ -9,20 +9,81 @@
 </head>
 <body>
 <div id="root">
-  <header>
-    <img src="images/logo.png" alt="kozhindev.com" />
-  </header>
-  <main>
-    <h1>KozhinDev</h1>
-    <article>
-      <p>Часы работы: с 8:00 до 19:00</p>
-      <small>Сейчас: 16:30</small>
-      <strong>Открыто</strong>
-    </article>
-  </main>
 </div>
 </body>
 <script>
+
+    function Header() {
+        const header = document.createElement('header');
+
+        header.append(Logo());
+
+        return header;
+    }
+
+    function Logo() {
+        const logo = document.createElement('img');
+        logo.src = 'images/logo.png';
+        logo.alt = 'kozhindev.com';
+
+        return logo;
+    }
+
+    function Main() {
+      const main = document.createElement('main');
+
+      main.append(Title());
+      main.append(Article());
+
+      return main;
+    }
+
+    function Title() {
+        const title = document.createElement('h1');
+        title.innerText = 'KozhinDev';
+
+        return title;
+    }
+
+    function Article() {
+        const article = document.createElement('article');
+
+        article.append(WorkTime());
+        article.append(CurrentTime());
+        article.append(Status())
+
+        return article
+    }
+
+    function WorkTime() {
+        const workTime = document.createElement('p');
+        workTime.innerText = 'Часы работы: с 8:00 до 19:00';
+
+        return workTime;
+    }
+
+    function CurrentTime() {
+        const currentTime = document.createElement('small')
+        currentTime.innerHTML = 'Сейчас: ' + new Date().toLocaleTimeString();
+
+        return currentTime
+    }
+
+    function Status() {
+        const status = document.createElement('strong');
+
+        if ((new Date().getHours() < 8) || (new Date().getHours() > 19)) {
+            status.innerText = ' Закрыто'
+        } else {
+            status.innerText = ' Открыто'
+        }
+
+        return status;
+    }
+
+    const app = document.getElementById('root');
+    app.append(Header());
+    app.append(Main());
 
 </script>
 </html>
