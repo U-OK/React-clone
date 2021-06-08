@@ -93,10 +93,10 @@
         return app;
     }
 
-    const newDOM = App(state);
-    const realDOM = document.getElementById('root');
-
-    render(newDOM, realDOM);
+    render(
+        App(state),
+        document.getElementById('root')
+    );
 
     function render (newDOM, realDOM) {
         realDOM.append(newDOM);
