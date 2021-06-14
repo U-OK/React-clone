@@ -34,12 +34,12 @@
     }
 
     function Main(props) {
-      const main = document.createElement('main');
+        const main = document.createElement('main');
 
-      main.append(Title());
-      main.append(Article(props.time));
+        main.append(Title());
+        main.append(Article(props.time));
 
-      return main;
+        return main;
     }
 
     function Title() {
@@ -110,9 +110,47 @@
         document.getElementById('root')
     );
 
-    function render (newDOM, realDOM) {
-        realDOM.innerText = '';
-        realDOM.append(newDOM);
+    function render(virtualDOM, realDOMRoot) {
+        const virtualDOMRoot = document.createElement(realDOMRoot.tagName);
+
+        virtualDOM.id = realDOMRoot.id;
+        virtualDOMRoot.appendChild(virtualDOM);
+
+        sync(virtualDOMRoot, realDOMRoot)
+    }
+
+    function sync(virtualNode, realNode) {
+        // Синхронизация аттрибутов
+        if(virtualNode.attributes) {
+            Array.from(virtualNode.attributes).forEach(attr => {
+                if (virtualNode[attr.name] !== realNode[attr.name]) {
+                    realNode[attr.name] = attr.value
+                }
+            })
+        }
+
+        // случай для пограничного состояния, когда вместо полноценного узла приходит Node.TEXT_NODE
+        if (virtualNode.nodeValue !== realNode.nodeValue) {
+            realNode.nodeValue = virtualNode.nodeValue
+        }
+
+        realNode.innerHTML = ''
+
+        // Синхронизация дочерних узлов
+        const virtualChildren = virtualNode.childNodes
+
+        for (let i = 0; i < virtualChildren.length; i++) {
+            const virtual = virtualChildren[i]
+
+            // Добавление нового узла
+            const newReal = virtual.nodeType === Node.TEXT_NODE
+                            ? document.createTextNode('')
+                            : document.createElement(virtual.tagName)
+
+            sync(virtual, newReal)
+
+            realNode.appendChild(newReal)
+        }
     }
 
 </script>
