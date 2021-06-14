@@ -102,11 +102,7 @@
             time: new Date(),
         }
 
-        const newApp = App(state);
-
-        const root = document.getElementById('root');
-        root.innerText = '';
-        root.append(newApp);
+        render(App(state), document.getElementById('root'))
     }, 1000)
 
     render(
@@ -115,6 +111,7 @@
     );
 
     function render (newDOM, realDOM) {
+        realDOM.innerText = '';
         realDOM.append(newDOM);
     }
 
