@@ -113,13 +113,16 @@
     function render(virtualDOM, realDOMRoot) {
         const virtualDOMRoot = document.createElement(realDOMRoot.tagName);
 
-        virtualDOM.id = realDOMRoot.id;
         virtualDOMRoot.appendChild(virtualDOM);
 
         sync(virtualDOMRoot, realDOMRoot)
     }
 
     function sync(virtualNode, realNode) {
+        if (virtualNode.className !== realNode.className) {
+            realNode.className = virtualNode.className
+        }
+
         // Синхронизация аттрибутов
         if(virtualNode.attributes) {
             Array.from(virtualNode.attributes).forEach(attr => {
