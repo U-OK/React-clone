@@ -69,12 +69,14 @@
     function CurrentTime(time) {
         const currentTime = document.createElement('small')
         currentTime.innerHTML = 'Сейчас: ' + time.toLocaleTimeString();
+        currentTime.className = 'CurrentTime';
 
         return currentTime
     }
 
     function Status(time) {
         const status = document.createElement('strong');
+        status.className = 'Status';
 
         if ((time.getHours() < 8) || (time.getHours() > 19)) {
             status.innerText = ' Закрыто'
@@ -87,6 +89,7 @@
 
     function App(state) {
         const app = document.createElement('div');
+        app.className = 'App';
         app.append(Header());
         app.append(Main(state));
 
@@ -94,18 +97,18 @@
     }
 
     setInterval(() => {
-        const time = new Date();
+        const time = new Date()
 
-        const currentTime = document.querySelector('small');
-        currentTime.innerText = 'Сейчас: ' + time.toLocaleTimeString();
+        const article = document.querySelector('article');
 
-        const status = document.querySelector('strong');
+        const newCurrentTime = CurrentTime(time);
+        const currentTime = document.querySelector('.CurrentTime');
 
-        if ((time.getHours() < 8) || (time.getHours() > 19)) {
-            status.innerText = ' Закрыто'
-        } else {
-            status.innerText = ' Открыто'
-        }
+        const newStatus = Status(time);
+        const status = document.querySelector('.Status');
+
+        article.replaceChild(newCurrentTime, currentTime);
+        article.replaceChild(newStatus, status);
     }, 1000)
 
     render(
