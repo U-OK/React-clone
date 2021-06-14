@@ -93,6 +93,21 @@
         return app;
     }
 
+    setInterval(() => {
+        const time = new Date();
+
+        const currentTime = document.querySelector('small');
+        currentTime.innerText = 'Сейчас: ' + time.toLocaleTimeString();
+
+        const status = document.querySelector('strong');
+
+        if ((time.getHours() < 8) || (time.getHours() > 19)) {
+            status.innerText = ' Закрыто'
+        } else {
+            status.innerText = ' Открыто'
+        }
+    }, 1000)
+
     render(
         App(state),
         document.getElementById('root')
