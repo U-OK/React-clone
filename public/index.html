@@ -134,23 +134,44 @@
             realNode.nodeValue = virtualNode.nodeValue
         }
 
-        realNode.innerHTML = ''
-
         // Синхронизация дочерних узлов
-        const virtualChildren = virtualNode.childNodes
+        const virtualChildren = virtualNode.childNodes;
+        const realChildren = realNode.childNodes;
 
-        for (let i = 0; i < virtualChildren.length; i++) {
+        for (let i = 0; i < virtualChildren.length || i < realChildren.length; i++) {
             const virtual = virtualChildren[i]
+            const real = realChildren[i];
+
+            // Если виртуального узла нет, а реальный есть - удаляем
+            if (virtual === undefined && real !== undefined) {
+                realNode.remove(real);
+            }
+
+            // Если виртуальный и реальный дом - один и тот же HTML тэг, то мы их синхронизируем
+            if (virtual !== undefined && real !== undefined && virtual.tagName === real.tagName) {
+                sync(virtual, real)
+            }
+
+            // Если тэги ни совпадают, то мы создаем такой тэг и синхронизируем с виртуальным
+            if (virtual !== undefined && real !== undefined && virtual.tagName !== real.tagName) {
+                const newReal = constructRealNodeByVirtualNode(virtual)
+                sync(virtual, newReal)
+                realNode.replaceChild(newReal, real)
+            }
 
             // Добавление нового узла
-            const newReal = virtual.nodeType === Node.TEXT_NODE
-                            ? document.createTextNode('')
-                            : document.createElement(virtual.tagName)
-
-            sync(virtual, newReal)
-
-            realNode.appendChild(newReal)
+            if (virtual !== undefined && real === undefined) {
+                const newReal = constructRealNodeByVirtualNode(virtual)
+                sync(virtual, newReal)
+                realNode.appendChild(newReal)
+            }
         }
+    }
+
+    function constructRealNodeByVirtualNode (virtualNode) {
+        return virtualNode.nodeType === Node.TEXT_NODE
+            ? document.createTextNode('')
+            : document.createElement(virtualNode.tagName)
     }
 
 </script>
