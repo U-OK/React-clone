@@ -131,6 +131,7 @@
             if (worker.isWorking) {
                 const workerNode = document.createElement('div');
                 workerNode.innerText = worker.name + '  ';
+                workerNode.dataset.key = worker.name;
                 workersNode.appendChild(workerNode);
             }
         })
@@ -187,6 +188,13 @@
                 if (virtualNode[attr.name] !== realNode[attr.name]) {
                     realNode[attr.name] = attr.value
                 }
+            })
+        }
+
+        // Синхронизация Keys
+        if (virtualNode.dataset) {
+            Object.keys(virtualNode.dataset).forEach((name) => {
+                realNode.dataset[name] = virtualNode.dataset[name]
             })
         }
 
