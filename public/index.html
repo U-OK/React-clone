@@ -13,8 +13,38 @@
 </body>
 <script>
 
+    function checkIsWorking() {
+        return Math.random() < 0.5
+    }
+
+    function getWorkers() {
+        return new Promise((resolve) => {
+            setTimeout(() => resolve(
+                [
+                    {
+                        name: 'Денис Мартынов',
+                        isWorking: checkIsWorking()
+                    },
+                    {
+                        name: 'Окунцев Юрий',
+                        isWorking: checkIsWorking()
+                    },
+                    {
+                        name: 'Александр Богатиков',
+                        isWorking: checkIsWorking()
+                    },
+                    {
+                        name: 'Денис Крылов',
+                        isWorking: checkIsWorking()
+                    },
+                ]
+            ), 1000)
+        })
+    }
+
     let state = {
         time: new Date(),
+        workers: null,
     };
 
     function Header() {
@@ -37,7 +67,7 @@
         const main = document.createElement('main');
 
         main.append(Title());
-        main.append(Article(props.time));
+        main.append(Article(props.time, props.workers));
 
         return main;
     }
@@ -49,12 +79,13 @@
         return title;
     }
 
-    function Article(time) {
+    function Article(time, workers) {
         const article = document.createElement('article');
 
         article.append(WorkTime());
         article.append(CurrentTime(time));
         article.append(Status(time))
+        article.append(Workers(workers))
 
         return article
     }
@@ -87,6 +118,26 @@
         return status;
     }
 
+    function Workers(workers) {
+        if (!workers) {
+            const loader = document.createElement('div');
+            loader.innerText = 'Загрузка...'
+            return loader;
+        }
+
+        const workersNode = document.createElement('div');
+
+        workers.forEach(worker => {
+            if (worker.isWorking) {
+                const workerNode = document.createElement('div');
+                workerNode.innerText = worker.name + '  ';
+                workersNode.appendChild(workerNode);
+            }
+        })
+
+        return workersNode;
+    }
+
     function App(state) {
         const app = document.createElement('div');
         app.className = 'App';
@@ -97,6 +148,13 @@
     }
 
     setInterval(() => {
+        getWorkers().then((workers) => {
+            state = {
+                ...state,
+                workers
+            }
+        })
+
         state = {
             ...state,
             time: new Date(),
