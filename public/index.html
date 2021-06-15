@@ -48,104 +48,179 @@
     };
 
     function Header() {
-        const header = document.createElement('header');
-
-        header.append(Logo());
-
-        return header;
+        return {
+            type: 'header',
+            props: {
+                children: [
+                    {
+                        type: Logo,
+                        props: {}
+                    }
+                ]
+            }
+        }
     }
 
     function Logo() {
-        const logo = document.createElement('img');
-        logo.src = 'images/logo.png';
-        logo.alt = 'kozhindev.com';
-
-        return logo;
+        return {
+            type: 'img',
+            props: {
+                src: 'images/logo.png',
+                alt: 'kozhindev.com',
+            }
+        }
     }
 
-    function Main(props) {
-        const main = document.createElement('main');
-
-        main.append(Title());
-        main.append(Article(props.time, props.workers));
-
-        return main;
+    function Main({props}) {
+        return {
+            type: 'main',
+            props: {
+                props,
+                children: [
+                    {
+                        type: Title,
+                        props: {},
+                    },
+                    {
+                        type: Article,
+                        props: {
+                            time: props.time,
+                            workers: props.workers,
+                        }
+                    }
+                ]
+            }
+        };
     }
 
     function Title() {
-        const title = document.createElement('h1');
-        title.innerText = 'KozhinDev';
-
-        return title;
+        return {
+            type: 'h1',
+            props: {
+                children: [
+                    'KozhinDev'
+                ]
+            }
+        };
     }
 
-    function Article(time, workers) {
-        const article = document.createElement('article');
-
-        article.append(WorkTime());
-        article.append(CurrentTime(time));
-        article.append(Status(time))
-        article.append(Workers(workers))
-
-        return article
+    function Article({time, workers}) {
+        return {
+            type: 'article',
+            props: {
+                children: [
+                    {
+                        type: WorkTime,
+                        props: {}
+                    },
+                    {
+                        type: CurrentTime,
+                        props: {
+                            time
+                        }
+                    },
+                    {
+                        type: Status,
+                        props: {
+                            time
+                        }
+                    },
+                    {
+                        type: Workers,
+                        props: {
+                            workers
+                        }
+                    }
+                ]
+            }
+        }
     }
 
     function WorkTime() {
-        const workTime = document.createElement('p');
-        workTime.innerText = 'Часы работы: с 8:00 до 19:00';
-
-        return workTime;
-    }
-
-    function CurrentTime(time) {
-        const currentTime = document.createElement('small')
-        currentTime.innerHTML = 'Сейчас: ' + time.toLocaleTimeString();
-        currentTime.className = 'CurrentTime';
-
-        return currentTime
-    }
-
-    function Status(time) {
-        const status = document.createElement('strong');
-        status.className = 'Status';
-
-        if ((time.getHours() < 8) || (time.getHours() > 19)) {
-            status.innerText = ' Закрыто'
-        } else {
-            status.innerText = ' Открыто'
-        }
-
-        return status;
-    }
-
-    function Workers(workers) {
-        if (!workers) {
-            const loader = document.createElement('div');
-            loader.innerText = 'Загрузка...'
-            return loader;
-        }
-
-        const workersNode = document.createElement('div');
-
-        workers.forEach(worker => {
-            if (worker.isWorking) {
-                const workerNode = document.createElement('div');
-                workerNode.innerText = worker.name + '  ';
-                workerNode.dataset.key = worker.name;
-                workersNode.appendChild(workerNode);
+        return {
+            type: 'p',
+            props: {
+                children: [
+                    'Часы работы: с 8:00 до 19:00'
+                ]
             }
-        })
+        };
+    }
 
-        return workersNode;
+    function CurrentTime({time}) {
+        return {
+            type: 'small',
+            props: {
+                className: 'CurrentTime',
+                children: [
+                    'Сейчас: ' + time.toLocaleTimeString()
+                ]
+            }
+        }
+    }
+
+    function Status({time}) {
+        return {
+            type: 'strong',
+            props: {
+                className: 'Status',
+                children: [
+                    (time.getHours() < 8) || (time.getHours() > 19)
+                        ? ' Закрыто'
+                        : ' Открыто'
+                ]
+            }
+        };
+    }
+
+    function Workers({workers}) {
+        if (!workers) {
+            return {
+                type: 'div',
+                props: {
+                    children: [
+                        'Загрузка...'
+                    ]
+                }
+            };
+        }
+
+        return {
+            type: 'div',
+            props: {
+                children: workers.filter(worker => worker.isWorking)
+                    .map(worker => ({
+                        type: 'div',
+                        props: {
+                            key: worker.name,
+                            children: [
+                                worker.name + '  '
+                            ]
+                        }
+                    }))
+            }
+        };
     }
 
     function App(state) {
-        const app = document.createElement('div');
-        app.className = 'App';
-        app.append(Header());
-        app.append(Main(state));
-
-        return app;
+        return {
+            type: 'div',
+            props: {
+                className: 'App',
+                children: [
+                    {
+                        type: Header,
+                        props: {}
+                    },
+                    {
+                        type: Main,
+                        props: {
+                            props: state
+                        }
+                    }
+                ]
+            }
+        };
     }
 
     setInterval(() => {
@@ -170,41 +245,60 @@
     );
 
     function render(virtualDOM, realDOMRoot) {
-        const virtualDOMRoot = document.createElement(realDOMRoot.tagName);
+        const interpretVirtualDOM = interpret(virtualDOM);
 
-        virtualDOMRoot.appendChild(virtualDOM);
+        const virtualDOMRoot = {
+            type: realDOMRoot.tagName.toLowerCase(),
+            props: {
+                children: [
+                    interpretVirtualDOM
+                ]
+            }
+        }
 
         sync(virtualDOMRoot, realDOMRoot)
     }
 
-    function sync(virtualNode, realNode) {
-        if (virtualNode.className !== realNode.className) {
-            realNode.className = virtualNode.className
+    function interpret(virtualNode) {
+        if (typeof virtualNode !== 'object') {
+            return virtualNode
         }
 
-        // Синхронизация аттрибутов
-        if(virtualNode.attributes) {
-            Array.from(virtualNode.attributes).forEach(attr => {
-                if (virtualNode[attr.name] !== realNode[attr.name]) {
-                    realNode[attr.name] = attr.value
+        if (typeof virtualNode.type === 'function') {
+            return interpret((virtualNode.type)(virtualNode.props))
+        }
+
+        const props = virtualNode.props || {}
+
+        return {
+            ...virtualNode,
+            props: {
+                ...props,
+                children: Array.isArray(props.children) ? props.children.map(interpret) : [interpret(props.children)]
+            }
+        }
+    }
+
+    function sync(virtualNode, realNode) {
+        // Синхронизация пропсов
+        if (virtualNode.props) {
+            Object.entries(virtualNode.props).forEach(([name, value]) => {
+                if (name === 'key' || name === 'children') {
+                    return
+                }
+                if (realNode[name] !== value) {
+                    realNode[name] = value
                 }
             })
         }
-
-        // Синхронизация Keys
-        if (virtualNode.dataset) {
-            Object.keys(virtualNode.dataset).forEach((name) => {
-                realNode.dataset[name] = virtualNode.dataset[name]
-            })
-        }
-
+        // debugger
         // случай для пограничного состояния, когда вместо полноценного узла приходит Node.TEXT_NODE
-        if (virtualNode.nodeValue !== realNode.nodeValue) {
-            realNode.nodeValue = virtualNode.nodeValue
+        if (typeof virtualNode !== 'object' && virtualNode !== realNode.nodeValue) {
+            realNode.nodeValue = virtualNode
         }
 
         // Синхронизация дочерних узлов
-        const virtualChildren = virtualNode.childNodes;
+        const virtualChildren = virtualNode.props ? virtualNode.props.children || [] : []
         const realChildren = realNode.childNodes;
 
         for (let i = 0; i < virtualChildren.length || i < realChildren.length; i++) {
@@ -217,12 +311,12 @@
             }
 
             // Если виртуальный и реальный дом - один и тот же HTML тэг, то мы их синхронизируем
-            if (virtual !== undefined && real !== undefined && virtual.tagName === real.tagName) {
+            if (virtual !== undefined && real !== undefined && (virtual.type || '') === (real.tagName?.toLowerCase() || '')) {
                 sync(virtual, real)
             }
 
             // Если тэги ни совпадают, то мы создаем такой тэг и синхронизируем с виртуальным
-            if (virtual !== undefined && real !== undefined && virtual.tagName !== real.tagName) {
+            if (virtual !== undefined && real !== undefined && (virtual.type || '') !== (real.tagName?.toLowerCase() || '')) {
                 const newReal = constructRealNodeByVirtualNode(virtual)
                 sync(virtual, newReal)
                 realNode.replaceChild(newReal, real)
@@ -237,10 +331,10 @@
         }
     }
 
-    function constructRealNodeByVirtualNode (virtualNode) {
-        return virtualNode.nodeType === Node.TEXT_NODE
+    function constructRealNodeByVirtualNode(virtualNode) {
+        return typeof virtualNode !== 'object'
             ? document.createTextNode('')
-            : document.createElement(virtualNode.tagName)
+            : document.createElement(virtualNode.type)
     }
 
 </script>
