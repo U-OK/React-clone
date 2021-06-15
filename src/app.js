@@ -43,11 +43,17 @@ let state = {
 };
 
 function Header() {
-    return ReactClone.createElement('header', {}, ReactClone.createElement(Logo))
+    return (
+        <header>
+            <Logo />
+        </header>
+    )
 }
 
 function Logo() {
-    return ReactClone.createElement('img', {src: 'images/logo.png', alt: 'kozhindev.com'})
+    return (
+        <img src='images/logo.png' alt='kozhindev.com' />
+    )
 }
 
 function Main({props}) {
