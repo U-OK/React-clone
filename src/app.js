@@ -45,64 +45,91 @@ let state = {
 function Header() {
     return (
         <header>
-            <Logo />
+            <Logo/>
         </header>
     )
 }
 
 function Logo() {
     return (
-        <img src='images/logo.png' alt='kozhindev.com' />
+        <img src='public/images/logo.png' alt='kozhindev.com'/>
     )
 }
 
 function Main({props}) {
-    return ReactClone.createElement('main', {props},
-        ReactClone.createElement(Title),
-        ReactClone.createElement(Article, {time: props.time, workers: props.workers}))
+    return (
+        <main>
+            <Title/>
+            <Article time={props.time} workers={props.workers}/>
+        </main>
+    )
 }
 
 function Title() {
-    return ReactClone.createElement('h1', {}, 'KozhinDev')
+    return (
+        <h1>KozhinDev</h1>
+    )
 }
 
 function Article({time, workers}) {
-    return ReactClone.createElement('article', {},
-        ReactClone.createElement(WorkTime),
-        ReactClone.createElement(CurrentTime, {time}),
-        ReactClone.createElement(Status, {time}),
-        ReactClone.createElement(Workers, {workers}))
+    return (
+        <article>
+            <WorkTime/>
+            <CurrentTime time={time}/>
+            <Status time={time}/>
+            <Workers workers={workers}/>
+        </article>
+    )
 }
 
 function WorkTime() {
-    return ReactClone.createElement('p', {}, 'Часы работы: с 8:00 до 19:00')
+    return (
+        <p>
+            Часы работы: с 8:00 до 19:00
+        </p>
+    )
 }
 
 function CurrentTime({time}) {
-    return ReactClone.createElement('small', {className: 'CurrentTime'}, 'Сейчас: ' + time.toLocaleTimeString())
+    return (
+        <small className='CurrentTime'>
+            {'Сейчас: ' + time.toLocaleTimeString()}
+        </small>
+    )
 }
 
 function Status({time}) {
-    return ReactClone.createElement('strong', {className: 'Status'},
-        (time.getHours() < 8) || (time.getHours() > 19)
-            ? ' Закрыто'
-            : ' Открыто')
+    return (
+        <strong className='Status'>
+            {
+                (time.getHours() < 8) || (time.getHours() > 19)
+                    ? ' Закрыто'
+                    : ' Открыто'
+            }
+        </strong>
+    )
 }
 
 function Workers({workers}) {
     if (!workers) {
-        return ReactClone.createElement('div', {}, 'Загрузка...')
+        return <div>Загрузка...</div>
     }
 
-    return ReactClone.createElement('div', {},
-        ...workers.filter(worker => worker.isWorking)
-            .map(worker => {
-                return ReactClone.createElement('div', {key: worker.name}, worker.name + '  ')
-            }))
+    return (
+        <div>
+            {workers.filter(worker => worker.isWorking)
+                .map(worker => <div key={worker.name}>{worker.name + '   '}</div>)}
+        </div>
+    )
 }
 
 function App({state}) {
-    return ReactClone.createElement('div', {className: 'App'}, ReactClone.createElement(Header), ReactClone.createElement(Main, {props: state}))
+    return (
+        <div className={'App'}>
+            <Header />
+            <Main props={state} />
+        </div>
+    )
 }
 
 setInterval(() => {
@@ -118,11 +145,11 @@ setInterval(() => {
         time: new Date(),
     }
 
-    render(ReactClone.createElement(App, {state}), document.getElementById('root'))
+    render(<App state={state} />, document.getElementById('root'))
 }, 1000)
 
 render(
-    ReactClone.createElement(App, {state}),
+    <App state={state} />,
     document.getElementById('root')
 );
 
